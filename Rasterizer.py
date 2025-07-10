@@ -6,7 +6,7 @@ width = 1920//2
 height = 1080//2
 
 screen = pygame.display.set_mode((width, height), pygame.SCALED)
-clock = pygame.time.Clock()
+reloj = pygame.time.Clock()
 
 rend = Renderer(screen)
 
@@ -26,7 +26,7 @@ polygons = [
 ]
 
 # Polígono 5
-hole = [
+hoyo = [
     (682, 175), (708, 120),
     (735, 148), (739, 170),
 ]
@@ -52,12 +52,12 @@ while isRunning:
         rend.glColor(1, 1, 1)
         rend.glPoligono(poly)
 
-    rend.glLlenarPoligono(hole, rend.clearColor)
+    rend.glLlenarPoligono(hoyo, rend.clearColor)
     rend.glColor(1, 1, 1)
-    rend.glPoligono(hole)
+    rend.glPoligono(hoyo)
 
     pygame.display.flip()
-    clock.tick(60)
+    reloj.tick(60)
 
 GenerateBMP("output.bmp", width, height, 3, rend.frameBuffer)
 pygame.quit()
