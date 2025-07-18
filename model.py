@@ -7,7 +7,7 @@ class Model(object):
 
         self.translation = [0,0,0]
         self.rotation = [0,0,0]
-        self.scale = [1,1,1]
+        self.scale = [2,2,2]
 
         self.vertexShader = None
 

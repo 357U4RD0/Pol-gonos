@@ -17,7 +17,7 @@ rend = Renderer(screen)
 
 
 triangleModel = Model()
-triangleModel.vertices = cargar_modelo("")
+triangleModel.vertices = cargar_modelo("modelos/Carro3D.obj")
 auto_fit_model(triangleModel, width, height)
 rend.models.append(triangleModel)
 
