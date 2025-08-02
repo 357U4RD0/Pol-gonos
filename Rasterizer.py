@@ -1,95 +1,70 @@
+import os
 import pygame
-from gl import *
-from BMP_Writer import GenerateBMP
+import numpy as np
+from collections import defaultdict
+from GraphicLibrary import Renderer
+from OBJ_Loader import LoadObj
 from model import Model
-from shaders import *
-from objloader import cargar_modelo
-from MathLib import auto_fit_model
-from shaders import vertexShader
+from MathLibrary import LookAt, RotationMatrix
+from shaders import VertexShader, GouraudShader
+from BMP_Writer import GenerateBmp
 
-width = 720
-height = 480
-
+width, height = 720, 480
+pygame.init()
 screen = pygame.display.set_mode((width, height), pygame.SCALED)
 clock = pygame.time.Clock()
+renderer = Renderer(screen)
+renderer.primitiveType = 2
 
-rend = Renderer(screen)
+vertices, uvs, normals, faces, mtl_map = LoadObj("models/Barco.obj")
 
+faces_by_mat = defaultdict(list)
+for tri, mat in faces:
+    faces_by_mat[mat].append(tri)
 
-triangleModel = Model()
-triangleModel.vertices = cargar_modelo("modelos/Carro3D.obj")
-auto_fit_model(triangleModel, width, height)
-rend.models.append(triangleModel)
+all_verts_xyz = []
+for mat, tris in faces_by_mat.items():
+    for tri in tris:
+        for vi, ti, ni in tri:
+            x, y, z = vertices[vi]
+            all_verts_xyz.append([x, y, z])
+all_verts_xyz = np.array(all_verts_xyz)
+centroid = all_verts_xyz.mean(axis=0)
 
-triangleModel.vertexShader = vertexShader
+for mat, tris in faces_by_mat.items():
+    model = Model()
+    buf = []
+    for tri in tris:
+        for vi, ti, ni in tri:
+            x, y, z = vertices[vi]
+            nx, ny, nz = normals[ni] if ni is not None else (0, 0, 1)
+            u, v = uvs[ti] if ti is not None else (0, 0)
+            x -= centroid[0]
+            y -= centroid[1]
+            z -= centroid[2]
+            buf += [x, y, z, nx, ny, nz, u, v]
+    model.vertices = buf
+    model.translation = [0, 0, 0]
+    model.scale = [6, 6, 6]
+    model.vertexShader = VertexShader
+    model.fragmentShader = GouraudShader
+    renderer.models.append(model)
 
-
-
-isRunning = True
-while isRunning:
-
-	deltaTime = clock.tick(60) / 1000.0
-
-
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			isRunning = False
-
-		elif event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_1:
-				rend.primitiveType = POINTS
-
-			elif event.key == pygame.K_2:
-				rend.primitiveType = LINES
-
-			elif event.key == pygame.K_3:
-				rend.primitiveType = TRIANGLES
-
-
-
-	keys = pygame.key.get_pressed()
-
-	if keys[pygame.K_RIGHT]:
-		triangleModel.translation[0] += 10 * deltaTime
-	if keys[pygame.K_LEFT]:
-		triangleModel.translation[0] -= 10 * deltaTime
-	if keys[pygame.K_UP]:
-		triangleModel.translation[1] += 10 * deltaTime
-	if keys[pygame.K_DOWN]:
-		triangleModel.translation[1] -= 10 * deltaTime
-
-
-	if keys[pygame.K_d]:
-		triangleModel.rotation[2] += 20 * deltaTime
-	if keys[pygame.K_a]:
-		triangleModel.rotation[2] -= 20 * deltaTime
-
-	if keys[pygame.K_w]:
-		triangleModel.scale =  [(i + deltaTime) for i in triangleModel.scale]
-	if keys[pygame.K_s]:
-		triangleModel.scale = [(i - deltaTime) for i in triangleModel.scale ]
-
-	rend.glClear()
-
-	rend.glRender()
-
-	pygame.display.flip()
-
-
-GenerateBMP("output.bmp", width, height, 3, rend.frameBuffer)
-# Definimos (modo, nombre_de_archivo)
-capturas = [
-    (POINTS,    "output_points.bmp"),
-    (LINES,     "output_lines.bmp"),
-    (TRIANGLES, "output_wireframe.bmp"),
-    (TRIANGLES, "output_filled.bmp"),  # si quisieras un 4º distinto, p. ej. con otro shader
-]
-
-for modo, fname in capturas:
-    rend.primitiveType = modo
-    rend.glClear()           
-    rend.glRender()         
-    GenerateBMP(fname, width, height, 3, rend.frameBuffer)
-
+running = True
+while running:
+    dt = clock.tick(60) / 1000
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_1:
+                renderer.primitiveType = 0
+            elif event.key == pygame.K_2:
+                renderer.primitiveType = 1
+            elif event.key == pygame.K_3:
+                renderer.primitiveType = 2
+    renderer.glClear()
+    renderer.glRender()
+    pygame.display.flip()
 
 pygame.quit()
