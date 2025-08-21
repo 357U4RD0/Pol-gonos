@@ -96,22 +96,22 @@ def build_models_from_obj(obj_path, v_sh, f_sh,
     return models
 
 SCENE = [
-    (os.path.join(BASE_DIR,"mayor","14082_WWII_Plane_Japan_Kawasaki_Ki-61_v1_L2.obj"),
+    (os.path.join(BASE_DIR,"modelos","14082_WWII_Plane_Japan_Kawasaki_Ki-61_v1_L2.obj"),
      (2.6,2.6,2.6), (-10.8, 6.50, -9.2), (-1,  57, 30),
      (VertexShader, MatrixBinaryShader),
      {"frag":{"speed":0.8,"scale":60,"palette":"rainbow"}}),
 
-    (os.path.join(BASE_DIR,"mayor","10621_CoastGuardHelicopter.obj"),
+    (os.path.join(BASE_DIR,"modelos","10621_CoastGuardHelicopter.obj"),
      (1,1,1), ( 3.2, 3.15, 0.3), (110, 200, 0),
      (VertexShader, RedCameraFacingShader),
      {"frag":{"rimIntensity":1.2}}),
     
-    (os.path.join(BASE_DIR,"mayor","Cyprys_House.obj"),
+    (os.path.join(BASE_DIR,"modelos","Cyprys_House.obj"),
      (6,6,6), (-6, -2.90, -6.8), (0, 20, 0),
      (VertexShader, HalftoneToonShader),
      {"frag":{"levels":4,"ambient":0.18,"dotSize":4}}),
 
-    (os.path.join(BASE_DIR,"mayor","11717_bicycle_v2_L1.obj"),
+    (os.path.join(BASE_DIR,"modelos","11717_bicycle_v2_L1.obj"),
      (1.5,1.5,1.5), ( 8.6, -3.90, -7.5), (180, -10, 90),
      (WaveVertexShader, CorruptGlitchShader),
      {"frag":{"intensity":1.15},
